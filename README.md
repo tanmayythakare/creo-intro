@@ -59,16 +59,26 @@ creo-intro/
 │   ├── creo-o.svg              # Refined 3D isometric 'O' with clean counter
 │   ├── creo-o-white.svg
 │   └── favicon.svg
+├── css/
+│   └── index.css               # Design system & responsive styles
+├── js/
+│   ├── app.js                  # Central application controller & interactive demos
+│   ├── orbital-engine.js       # Section 01 Cybernetic radial matrix engine
+│   ├── dithered-object.js      # Section 02 Three.js Halftone shader engine
+│   └── scene3d.js              # 3D spatial cyberspace utilities
 ├── lib/                        # Local vendor libraries (100% offline & CORS-free)
 │   ├── lenis.min.js            # Smooth inertial scroll engine
 │   ├── three.module.js         # Three.js 3D rendering core
 │   ├── OrbitControls.js        # Three.js orbit controls
 │   └── gsap.min.js             # GSAP animation library
-├── app.js                      # Central application controller & interactive demos
-├── dithered-object.js          # Section 02 Three.js Halftone shader engine
-├── orbital-engine.js           # Section 01 Cybernetic radial matrix engine
+├── previews/                   # Standalone sandbox prototypes
+│   ├── logo-preview.html
+│   ├── orbital-preview.html
+│   └── decrypt-reveal.js
+├── .github/workflows/
+│   └── deploy.yml              # Automated AWS S3 + CloudFront CI/CD pipeline
 ├── index.html                  # Single-page application markup
-├── index.css                   # High-contrast monochrome & neon purple design system
+├── error.html                  # Custom S3 404 error document
 ├── server.js                   # Lightweight zero-dependency Node.js HTTP server
 ├── start.bat                   # 1-click Windows launcher
 ├── package.json

@@ -6,8 +6,8 @@
  * with real-time Bayer Matrix, Halftone Dots, and Floyd–Steinberg post-processing dither shaders.
  */
 
-import * as THREE from './lib/three.module.js';
-import { OrbitControls } from './lib/OrbitControls.js';
+import * as THREE from '../lib/three.module.js';
+import { OrbitControls } from '../lib/OrbitControls.js';
 
 const DEFAULTS = {
   src: 'assets/brand-glyph-solid.svg',

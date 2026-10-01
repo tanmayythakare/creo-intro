@@ -1,0 +1,74 @@
+name: Deploy to S3 + CloudFront
+
+on:
+  push:
+    branches: [main]
+  workflow_dispatch: {}
+
+permissions:
+  id-token: write
+  contents: write
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Configure AWS credentials (OIDC)
+        uses: aws-actions/configure-aws-credentials@v4
+        with:
+          role-to-assume: ${{ secrets.AWS_ROLE_ARN }}
+          aws-region: ap-south-1
+
+      - name: Sync static files to S3
+        run: |
+          aws s3 sync . s3://creo-intro \
+            --delete \
+            --exclude ".git/*" \
+            --exclude ".github/*" \
+            --exclude ".gitignore" \
+            --exclude ".vscode/*" \
+            --exclude "node_modules/*" \
+            --exclude "server.js" \
+            --exclude "start.bat" \
+            --exclude "package.json" \
+            --exclude "package-lock.json" \
+            --exclude "README.md" \
+            --exclude "LICENSE" \
+            --exclude "logo-preview.html" \
+            --exclude "orbital-preview.html"
+
+      - name: Invalidate CloudFront cache
+        run: |
+          aws cloudfront create-invalidation \
+            --distribution-id EEOXVUV70DGSH \
+            --paths "/*"
+
+      - name: Determine CloudFront URL
+        id: cf
+        run: |
+          DOMAIN=$(aws cloudfront get-distribution \
+            --id EEOXVUV70DGSH \
+            --query 'Distribution.DomainName' --output text)
+          echo "url=https://$DOMAIN" >> "$GITHUB_OUTPUT"
+
+      - name: Update README placeholder
+        run: |
+          sed -i 's|https://<YOUR-CLOUDFRONT-ENDPOINT>.cloudfront.net|${{ steps.cf.outputs.url }}|g' README.md
+
+      - name: Commit updated README
+        uses: stefanzweifel/git-auto-commit-action@v5
+        with:
+          commit_message: "chore: update live demo URL"
+          branch: main
+          file_pattern: README.md
+
+      - name: Verify deployment
+        run: |
+          sleep 10
+          curl -fsSL -o /dev/null -w "HTTP %{http_code}" "${{ steps.cf.outputs.url }}"

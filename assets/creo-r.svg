@@ -1,0 +1,53 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 120 140" width="120" height="140">
+  <defs>
+    <linearGradient id="navFrontGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#ffffff"/>
+      <stop offset="25%" stop-color="#c4b5fd"/>
+      <stop offset="70%" stop-color="#a78bfa"/>
+      <stop offset="100%" stop-color="#7c3aed"/>
+    </linearGradient>
+    <linearGradient id="navRimGrad" x1="0%" y1="0%" x2="100%" y2="0%">
+      <stop offset="0%" stop-color="#ffffff"/>
+      <stop offset="60%" stop-color="#e9d5ff"/>
+      <stop offset="100%" stop-color="#a78bfa"/>
+    </linearGradient>
+    <linearGradient id="navExtrudeSide" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#581c87"/>
+      <stop offset="100%" stop-color="#1e0836"/>
+    </linearGradient>
+    <linearGradient id="navExtrudeBottom" x1="0%" y1="0%" x2="0%" y2="100%">
+      <stop offset="0%" stop-color="#3b0764"/>
+      <stop offset="100%" stop-color="#0f021f"/>
+    </linearGradient>
+  </defs>
+
+  <g transform="skewX(-13) translate(10, 3)">
+    <!-- 3D Depth / Extrusions (Strictly Outer Contours) -->
+    <polygon points="106,0 114,7 114,28 106,28" fill="url(#navExtrudeSide)"/>
+    <polygon points="106,28 114,35 114,72 106,72" fill="url(#navExtrudeSide)"/>
+    <polygon points="36,72 72,72 76,76 40,76" fill="url(#navExtrudeBottom)"/>
+    <polygon points="76,76 82,81 82,94 76,94" fill="url(#navExtrudeSide)"/>
+    <polygon points="106,98 114,105 114,126 106,126" fill="url(#navExtrudeSide)"/>
+    <polygon points="72,126 106,126 114,133 80,133" fill="url(#navExtrudeBottom)"/>
+    <polygon points="0,98 22,126 30,133 0,105" fill="url(#navExtrudeBottom)"/>
+
+    <!-- Front Modular Keycap Blocks for 'R' -->
+    <!-- Left Vertical Spine -->
+    <polygon points="10,14 32,0 32,28 0,28" fill="url(#navFrontGrad)" stroke="url(#navRimGrad)" stroke-width="1.4"/>
+    <rect x="0" y="32" width="32" height="18" rx="3" fill="url(#navFrontGrad)" stroke="url(#navRimGrad)" stroke-width="1.4"/>
+    <rect x="0" y="54" width="32" height="18" rx="3" fill="url(#navFrontGrad)" stroke="url(#navRimGrad)" stroke-width="1.4"/>
+    <rect x="0" y="76" width="32" height="18" rx="3" fill="url(#navFrontGrad)" stroke="url(#navRimGrad)" stroke-width="1.4"/>
+    <polygon points="0,98 32,98 22,126 0,98" fill="url(#navFrontGrad)" stroke="url(#navRimGrad)" stroke-width="1.4"/>
+
+    <!-- Top Loop (With Clean Open Counter Hole x=32..72, y=28..54) -->
+    <rect x="36" y="0" width="32" height="28" rx="3.5" fill="url(#navFrontGrad)" stroke="url(#navRimGrad)" stroke-width="1.4"/>
+    <rect x="72" y="0" width="34" height="28" rx="4" fill="url(#navFrontGrad)" stroke="url(#navRimGrad)" stroke-width="1.4"/>
+    <rect x="72" y="32" width="34" height="18" rx="3.5" fill="url(#navFrontGrad)" stroke="url(#navRimGrad)" stroke-width="1.4"/>
+    <rect x="36" y="54" width="32" height="18" rx="3" fill="url(#navFrontGrad)" stroke="url(#navRimGrad)" stroke-width="1.4"/>
+    <rect x="72" y="54" width="34" height="18" rx="3.5" fill="url(#navFrontGrad)" stroke="url(#navRimGrad)" stroke-width="1.4"/>
+
+    <!-- Diagonal Stepped Leg (Archway between x=32 and x=72) -->
+    <rect x="46" y="76" width="30" height="18" rx="3" fill="url(#navFrontGrad)" stroke="url(#navRimGrad)" stroke-width="1.4"/>
+    <rect x="72" y="98" width="34" height="28" rx="4" fill="url(#navFrontGrad)" stroke="url(#navRimGrad)" stroke-width="1.4"/>
+  </g>
+</svg>

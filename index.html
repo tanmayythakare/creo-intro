@@ -1,0 +1,1569 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Creo — Microservice Workspace Orchestrator for Windows Terminal</title>
+  <meta name="description" content="Creo is an ultra-fast developer productivity CLI in Go for Windows Terminal. Interactive 3D WebGL spatial workspace orchestration, signature purple terminal aesthetics, zero orphaned ports, sub-180ms boot.">
+  <meta name="keywords" content="Creo, Golang, Windows Terminal, wt.exe, Microservices, Developer Tools, 3D WebGL, Three.js, CLI Orchestrator">
+  <!-- High-DPI Favicon Assets (Option 03 Solid Minimal C Logo) -->
+  <link rel="icon" type="image/svg+xml" href="assets/favicon.svg">
+  <link rel="alternate icon" href="assets/favicon-03-solid.svg">
+  <link rel="apple-touch-icon" href="assets/favicon.svg">
+
+  <!-- Modern Typography (Inter & JetBrains Mono) -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&family=JetBrains+Mono:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  
+  <!-- Main Stylesheet -->
+  <link rel="stylesheet" href="index.css">
+
+  <script src="./lib/gsap.min.js"></script>
+</head>
+<body>
+  <!-- Cyber Top Scroll Progress Bar -->
+  <div class="cyber-scroll-progress" id="scrollProgress" aria-hidden="true"></div>
+
+  <!-- High-End Invert / Difference Blend Mode Cursor -->
+  <div class="diff-cursor-follower" id="cursorRing" aria-hidden="true"></div>
+  <div class="diff-cursor-dot" id="cursorDot" aria-hidden="true"></div>
+
+  <!-- Page-Wide Fluid Cosmic Stardust & Liquid Ribbon Canvas -->
+  <canvas id="globalCosmicCanvas" class="global-cosmic-canvas" aria-hidden="true"></canvas>
+
+  <!-- Click Spark Canvas Particle Emitter -->
+  <canvas id="clickSparksCanvas" class="click-sparks-canvas" aria-hidden="true"></canvas>
+
+  <!-- Ambient Glow & Subtle Geometric Spatial Grid Overlay -->
+  <div class="ambient-glow glow-purple-main" aria-hidden="true"></div>
+  <div class="spatial-grid-overlay" aria-hidden="true"></div>
+
+  <!-- Sticky Top Navbar -->
+  <header class="navbar" id="topNavbar">
+    <div class="container nav-container">
+      <div class="nav-left">
+        <a href="#hero" class="brand" aria-label="Creo Home">
+          <span class="brand-text">creo</span>
+          <span class="version-tag">v0.4.0</span>
+        </a>
+      </div>
+
+      <nav class="nav-links" id="navLinks">
+        <a href="#hero" class="nav-item-link" data-nav="hero">Overview</a>
+        <a href="#problem" class="nav-item-link" data-nav="problem">Problem</a>
+        <a href="#bento" class="nav-item-link" data-nav="bento">Architecture</a>
+        <a href="#how-it-works" class="nav-item-link" data-nav="how-it-works">Flow</a>
+        <a href="#configurator" class="nav-item-link" data-nav="configurator">Config</a>
+        <a href="#demo" class="nav-item-link" data-nav="demo">Terminal</a>
+        <a href="#ecosystem" class="nav-item-link" data-nav="ecosystem">Ecosystem</a>
+        <a href="#install" class="nav-item-link" data-nav="install">Install</a>
+      </nav>
+
+      <div class="nav-actions">
+        <!-- Command Palette Trigger Button (Ctrl+K) -->
+        <button class="btn btn-palette-trigger magnetic-target" id="cmdPaletteBtn" title="Open Command Palette (Ctrl+K)" aria-label="Open Command Palette">
+          <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <circle cx="11" cy="11" r="8"></circle>
+            <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
+          </svg>
+          <span class="palette-key"><kbd>Ctrl</kbd><kbd>K</kbd></span>
+        </button>
+
+        <!-- Sound FX Mute/Unmute Toggle + Visualizer EQ -->
+        <button class="btn btn-icon-sound magnetic-target" id="soundToggleBtn" title="Toggle Mechanical Audio FX" aria-label="Toggle Sound Effects">
+          <svg class="sound-on-icon" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5"></polygon>
+            <path d="M19.07 4.93a10 10 0 0 1 0 14.14M15.54 8.46a5 5 0 0 1 0 7.07"></path>
+          </svg>
+          <svg class="sound-off-icon hidden" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5"></polygon>
+            <line x1="23" y1="9" x2="17" y2="15"></line>
+            <line x1="17" y1="9" x2="23" y2="15"></line>
+          </svg>
+          <!-- Mini 4-Bar Audio Equalizer -->
+          <div class="sound-equalizer" id="soundEq" aria-hidden="true">
+            <span class="eq-bar"></span>
+            <span class="eq-bar"></span>
+            <span class="eq-bar"></span>
+            <span class="eq-bar"></span>
+          </div>
+        </button>
+
+        <div class="nav-divider" aria-hidden="true"></div>
+
+        <!-- GitHub Repo Button -->
+        <a href="https://github.com/tanmayythakare/creo" target="_blank" rel="noopener noreferrer" class="btn btn-github magnetic-target">
+          <svg width="15" height="15" viewBox="0 0 24 24" fill="currentColor">
+            <path d="M12 0C5.37 0 0 5.37 0 12c0 5.31 3.435 9.795 8.205 11.385.6.105.825-.255.825-.57 0-.285-.015-1.23-.015-2.235-3.015.555-3.795-.735-4.035-1.41-.135-.345-.72-1.41-1.23-1.695-.42-.225-1.02-.78-.015-.795.945-.015 1.62.87 1.845 1.23 1.08 1.815 2.805 1.305 3.495.99.105-.78.42-1.305.765-1.605-2.67-.3-5.46-1.335-5.46-5.925 0-1.305.465-2.385 1.23-3.225-.12-.3-.54-1.53.12-3.18 0 0 1.005-.315 3.3 1.23.96-.27 1.98-.405 3-.405s2.04.135 3 .405c2.295-1.56 3.3-1.23 3.3-1.23.66 1.65.24 2.88.12 3.18.765.84 1.23 1.905 1.23 3.225 0 4.605-2.805 5.625-5.475 5.925.435.375.81 1.095.81 2.22 0 1.605-.015 2.895-.015 3.3 0 .315.225.69.825.57A12.02 12.02 0 0024 12c0-6.63-5.37-12-12-12z"/>
+          </svg>
+          <span class="gh-text">GitHub</span>
+          <span class="gh-star-count">★ Star</span>
+        </a>
+
+        <!-- Mobile Drawer Toggle Button -->
+        <button class="mobile-menu-btn" id="mobileMenuBtn" aria-label="Toggle Navigation Menu">
+          <span></span>
+          <span></span>
+          <span></span>
+        </button>
+      </div>
+    </div>
+  </header>
+
+  <!-- Pinned Side Stage Navigation Tracker -->
+  <aside class="pinned-stage-tracker" id="stageTracker" aria-label="Scroll Navigation Tracker">
+    <div class="tracker-line"><div class="tracker-progress-thumb" id="trackerThumb"></div></div>
+    <a href="#hero" class="tracker-node active" data-target="hero" title="01 Hero Matrix"><span class="node-dot"></span><span class="node-label">01 Matrix</span></a>
+    <a href="#problem" class="tracker-node" data-target="problem" title="02 Friction"><span class="node-dot"></span><span class="node-label">02 The Chaos</span></a>
+    <a href="#bento" class="tracker-node" data-target="bento" title="03 Architecture"><span class="node-dot"></span><span class="node-label">03 Architecture</span></a>
+    <a href="#how-it-works" class="tracker-node" data-target="how-it-works" title="04 Flow"><span class="node-dot"></span><span class="node-label">04 Flow</span></a>
+    <a href="#configurator" class="tracker-node" data-target="configurator" title="05 Configurator"><span class="node-dot"></span><span class="node-label">05 Configurator</span></a>
+    <a href="#demo" class="tracker-node" data-target="demo" title="06 Terminal"><span class="node-dot"></span><span class="node-label">06 Terminal</span></a>
+    <a href="#ecosystem" class="tracker-node" data-target="ecosystem" title="07 Ecosystem"><span class="node-dot"></span><span class="node-label">07 Ecosystem</span></a>
+    <a href="#install" class="tracker-node" data-target="install" title="08 Install"><span class="node-dot"></span><span class="node-label">08 Install</span></a>
+  </aside>
+
+  <!-- Mobile Drawer Menu -->
+  <div class="mobile-drawer" id="mobileDrawer">
+    <div class="drawer-content">
+      <a href="#hero" class="drawer-link">3D Matrix</a>
+      <a href="#problem" class="drawer-link">The Problem</a>
+      <a href="#bento" class="drawer-link">Core Architecture</a>
+      <a href="#how-it-works" class="drawer-link">How It Works</a>
+      <a href="#configurator" class="drawer-link">Config Generator</a>
+      <a href="#demo" class="drawer-link">Interactive Terminal</a>
+      <a href="#install" class="drawer-link">Installation</a>
+      <div class="drawer-footer">
+        <a href="https://github.com/tanmayythakare/creo" target="_blank" rel="noopener noreferrer" class="btn btn-primary btn-block">
+          View on GitHub
+        </a>
+      </div>
+    </div>
+  </div>
+
+  <main>
+    <!-- ====================================================================
+         SECTION 01: HERO — CINEMATIC 3D WEBGL CYBERSPACE
+         ==================================================================== -->
+    <section class="hero-section scroll-section" id="hero">
+      <div class="container hero-container">
+        
+        <!-- Requirement Badge Pill -->
+        <div class="hero-badge anim-reveal" id="heroBadge">
+          <span class="badge-dot pulse-anim"></span>
+          <span class="badge-text">Developer productivity CLI in Go</span>
+          <span class="badge-sep">•</span>
+          <span class="badge-req">Windows Terminal Native (wt.exe)</span>
+          <span class="badge-arrow">→</span>
+        </div>
+
+        <!-- Main Headline -->
+        <h1 class="hero-headline anim-reveal">
+          <span class="hero-title-line">Stop terminal juggling.</span><br>
+          <span class="text-gradient-purple hero-title-line">Orchestrate with Go precision.</span>
+        </h1>
+
+        <!-- Subheading -->
+        <p class="hero-desc anim-reveal">
+          One command boots your entire multi-service universe inside organized Windows Terminal tabs in <strong>&lt;180ms</strong>. Zero orphaned ports. Pure Go power.
+        </p>
+
+        <!-- CTA Buttons & Command Preview -->
+        <div class="hero-ctas anim-reveal">
+          <button class="btn btn-primary btn-hero-primary magnetic-target" id="btnOrchestrate3D">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+              <path d="M4.5 16.5c-1.5 1.26-2 5-2 5s3.74-.5 5-2c.71-.84.7-2.13-.09-2.91a2.18 2.18 0 0 0-2.91-.09z"></path>
+              <path d="m12 15-3-3a22 22 0 0 1 2-3.95A12.88 12.88 0 0 1 22 2c0 2.72-.78 7.5-6 11a22.35 22.35 0 0 1-4 2z"></path>
+              <path d="M9 12H4s.55-3.03 2-4c1.62-1.08 5 0 5 0"></path>
+              <path d="M12 15v5s3.03-.55 4-2c1.08-1.62 0-5 0-5"></path>
+            </svg>
+            <span id="btnOrchestrate3DText">Launch Workspace (creo up)</span>
+            <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+              <line x1="5" y1="12" x2="19" y2="12"></line>
+              <polyline points="12 5 19 12 12 19"></polyline>
+            </svg>
+          </button>
+          <button class="btn btn-secondary hero-quick-copy magnetic-target" id="heroQuickCopy" data-copy="scoop bucket add creo https://github.com/tanmayythakare/scoop-creo && scoop install creo">
+            <span class="cmd-prompt">$</span>
+            <code>scoop install creo</code>
+            <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <rect x="9" y="9" width="13" height="13" rx="2" ry="2"></rect>
+              <path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"></path>
+            </svg>
+          </button>
+        </div>
+
+        <!-- ================================================================
+             TRUE 3D WEBGL CANVAS VIEWPORT (Three.js + Orbit + Raycaster)
+             ================================================================ -->
+        <div class="viewport-3d-wrapper anim-reveal" id="viewport3DWrapper">
+          
+          <!-- 3D Cyberspace Spatial Matrix Container -->
+          <div class="viewport-3d" id="viewport3D" role="region" aria-label="Interactive 3D Spatial Microservice Cluster">
+            <div id="stageWrapper" class="stage-wrapper">
+              
+              <!-- 1. Starfield Particles Canvas with Electrostatic Mouse Repulsion -->
+              <canvas id="starCanvas" class="star-canvas"></canvas>
+
+              <!-- 2. Fluid Liquid-Ink Ribbon Trails Canvas -->
+              <canvas id="fluidCanvas" class="fluid-canvas"></canvas>
+
+              <!-- 3. Cosmic Asteroid Belt Fragments in Background (Removed) -->
+
+              <!-- 4. Cybernetic Radial Microservice Orchestration Matrix Container -->
+              <div id="cyberMatrixContainer" class="cyber-matrix-container">
+                
+                <!-- Ambient Concentric Radar / HUD Rings -->
+                <div class="hud-radar-grid">
+                  <div class="radar-circle radar-1"></div>
+                  <div class="radar-circle radar-2"></div>
+                  <div class="radar-circle radar-3"></div>
+                  <div id="shockwaveRing" class="shockwave-ring"></div>
+                </div>
+
+                <!-- Dynamic SVG Circuit Conduits & Junction Nodes -->
+                <svg id="conduitSvg" class="cyber-conduit-svg" viewBox="0 0 1080 520">
+                  <defs>
+                    <linearGradient id="traceGradCyan" x1="0%" y1="0%" x2="0%" y2="100%">
+                      <stop offset="0%" stop-color="#38bdf8" stop-opacity="0.9"/>
+                      <stop offset="100%" stop-color="#0284c7" stop-opacity="0.3"/>
+                    </linearGradient>
+                    <linearGradient id="traceGradPurple" x1="0%" y1="0%" x2="100%" y2="0%">
+                      <stop offset="0%" stop-color="#a855f7" stop-opacity="0.3"/>
+                      <stop offset="100%" stop-color="#c084fc" stop-opacity="0.9"/>
+                    </linearGradient>
+                    <linearGradient id="traceGradRed" x1="0%" y1="0%" x2="100%" y2="0%">
+                      <stop offset="0%" stop-color="#f43f5e" stop-opacity="0.3"/>
+                      <stop offset="100%" stop-color="#fb7185" stop-opacity="0.9"/>
+                    </linearGradient>
+                    <linearGradient id="traceGradTeal" x1="0%" y1="0%" x2="0%" y2="100%">
+                      <stop offset="0%" stop-color="#10b981" stop-opacity="0.3"/>
+                      <stop offset="100%" stop-color="#34d399" stop-opacity="0.9"/>
+                    </linearGradient>
+                    <linearGradient id="traceGradBlue" x1="100%" y1="0%" x2="0%" y2="0%">
+                      <stop offset="0%" stop-color="#3b82f6" stop-opacity="0.3"/>
+                      <stop offset="100%" stop-color="#60a5fa" stop-opacity="0.9"/>
+                    </linearGradient>
+                    <linearGradient id="traceGradViolet" x1="100%" y1="0%" x2="0%" y2="0%">
+                      <stop offset="0%" stop-color="#9333ea" stop-opacity="0.3"/>
+                      <stop offset="100%" stop-color="#c084fc" stop-opacity="0.9"/>
+                    </linearGradient>
+                    <filter id="glowFilter" x="-20%" y="-20%" width="140%" height="140%">
+                      <feGaussianBlur stdDeviation="3" result="blur" />
+                      <feComposite in="SourceGraphic" in2="blur" operator="over" />
+                    </filter>
+                  </defs>
+
+                  <!-- Conduit Traces Connecting Hub to 6 Microservices -->
+                  <!-- Top: Frontend SPA -->
+                  <path id="traceFrontend" class="circuit-path path-cyan" d="M 540 168 L 540 126" stroke="#38bdf8" stroke-width="1.8" fill="none" opacity="0.7"/>
+                  <!-- Top-Right: Backend API -->
+                  <path id="traceBackend" class="circuit-path path-purple" d="M 622 215 L 678 185 L 720 185" stroke="#c084fc" stroke-width="1.8" fill="none" opacity="0.7"/>
+                  <!-- Bottom-Right: Redis Cache -->
+                  <path id="traceRedis" class="circuit-path path-red" d="M 622 305 L 678 335 L 720 335" stroke="#f43f5e" stroke-width="1.8" fill="none" opacity="0.7"/>
+                  <!-- Bottom: Worker / Jobs -->
+                  <path id="traceWorker" class="circuit-path path-teal" d="M 540 352 L 540 394" stroke="#10b981" stroke-width="1.8" fill="none" opacity="0.7"/>
+                  <!-- Bottom-Left: PostgreSQL -->
+                  <path id="tracePostgres" class="circuit-path path-blue" d="M 458 305 L 402 335 L 360 335" stroke="#3b82f6" stroke-width="1.8" fill="none" opacity="0.7"/>
+                  <!-- Top-Left: File Storage -->
+                  <path id="traceStorage" class="circuit-path path-violet" d="M 458 215 L 402 185 L 360 185" stroke="#a855f7" stroke-width="1.8" fill="none" opacity="0.7"/>
+
+                  <!-- Hub Junction Pin Nodes -->
+                  <circle cx="540" cy="168" r="3.5" class="junction-pin pin-cyan"/>
+                  <circle cx="622" cy="215" r="3.5" class="junction-pin pin-purple"/>
+                  <circle cx="622" cy="305" r="3.5" class="junction-pin pin-red"/>
+                  <circle cx="540" cy="352" r="3.5" class="junction-pin pin-teal"/>
+                  <circle cx="458" cy="305" r="3.5" class="junction-pin pin-blue"/>
+                  <circle cx="458" cy="215" r="3.5" class="junction-pin pin-violet"/>
+
+                  <!-- Card Terminal Pin Nodes -->
+                  <circle cx="540" cy="126" r="3" class="junction-pin pin-cyan"/>
+                  <circle cx="720" cy="185" r="3" class="junction-pin pin-purple"/>
+                  <circle cx="720" cy="335" r="3" class="junction-pin pin-red"/>
+                  <circle cx="540" cy="394" r="3" class="junction-pin pin-teal"/>
+                  <circle cx="360" cy="335" r="3" class="junction-pin pin-blue"/>
+                  <circle cx="360" cy="185" r="3" class="junction-pin pin-violet"/>
+                </svg>
+
+                <!-- Travelling Data Packets Container -->
+                <div id="dataPacketsContainer" class="data-packets-layer"></div>
+
+                <!-- Central Orchestrator Core Hub -->
+                <div id="reactorNexus" class="orchestrator-hub-root" title="Creo Root Orchestrator — Click to pulse matrix!">
+                  
+                  <!-- Layer 1: Rotating Cybernetic HUD Rings & Meter Arcs -->
+                  <div class="hub-hud-ring-wrapper">
+                    <svg class="hub-hud-svg" viewBox="0 0 240 240">
+                      <!-- Outer dashed tracking circle -->
+                      <circle cx="120" cy="120" r="108" fill="none" stroke="rgba(168, 85, 247, 0.25)" stroke-width="1.2" stroke-dasharray="4 6"/>
+                      
+                      <!-- Segmented luminous HUD progress arcs -->
+                      <!-- Cyan arc: top-right -->
+                      <path d="M 120 12 A 108 108 0 0 1 204 52" fill="none" stroke="#38bdf8" stroke-width="3" stroke-linecap="round" filter="drop-shadow(0 0 6px #38bdf8)"/>
+                      <!-- Magenta/Purple arc: bottom-right -->
+                      <path d="M 224 140 A 108 108 0 0 1 176 210" fill="none" stroke="#a855f7" stroke-width="2.5" stroke-linecap="round" filter="drop-shadow(0 0 6px #a855f7)"/>
+                      <!-- Teal/Cyan arc: bottom-left -->
+                      <path d="M 64 210 A 108 108 0 0 1 24 150" fill="none" stroke="#06b6d4" stroke-width="3" stroke-linecap="round" filter="drop-shadow(0 0 6px #06b6d4)"/>
+                      
+                      <!-- Inner tick scale circle -->
+                      <circle cx="120" cy="120" r="92" fill="none" stroke="rgba(255, 255, 255, 0.15)" stroke-width="1" stroke-dasharray="2 10"/>
+                    </svg>
+                  </div>
+
+                  <!-- Layer 2: Deep Obsidian Glassmorphic Central Plate -->
+                  <div id="geodesicSphere" class="hub-center-disc">
+                    
+                    <!-- 3D Isometric Purple Cube Glyph -->
+                    <div class="hub-isometric-cube">
+                      <svg viewBox="0 0 80 80" width="60" height="60">
+                        <defs>
+                          <linearGradient id="cubeTopGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+                            <stop offset="0%" stop-color="#c084fc"/>
+                            <stop offset="100%" stop-color="#8b5cf6"/>
+                          </linearGradient>
+                          <linearGradient id="cubeLeftGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+                            <stop offset="0%" stop-color="#7c3aed"/>
+                            <stop offset="100%" stop-color="#4c1d95"/>
+                          </linearGradient>
+                          <linearGradient id="cubeRightGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+                            <stop offset="0%" stop-color="#9333ea"/>
+                            <stop offset="100%" stop-color="#581c87"/>
+                          </linearGradient>
+                        </defs>
+                        <!-- Top Isometric Facet -->
+                        <polygon points="40,8 66,22 40,36 14,22" fill="url(#cubeTopGrad)" stroke="#e9d5ff" stroke-width="1.6" opacity="0.95"/>
+                        <!-- Left Isometric Facet -->
+                        <polygon points="14,22 40,36 40,65 14,51" fill="url(#cubeLeftGrad)" stroke="#c084fc" stroke-width="1.6" opacity="0.9"/>
+                        <!-- Right Isometric Facet -->
+                        <polygon points="40,36 66,22 66,51 40,65" fill="url(#cubeRightGrad)" stroke="#a855f7" stroke-width="1.6" opacity="0.95"/>
+                        
+                        <!-- Inner neon wireframe accents -->
+                        <line x1="40" y1="36" x2="40" y2="8" stroke="#ffffff" stroke-width="1.2" opacity="0.8"/>
+                        <line x1="40" y1="36" x2="14" y2="22" stroke="#ffffff" stroke-width="1.2" opacity="0.8"/>
+                        <line x1="40" y1="36" x2="66" y2="22" stroke="#ffffff" stroke-width="1.2" opacity="0.8"/>
+                      </svg>
+                    </div>
+
+                    <!-- Hub Brand Title & Status Lockup -->
+                    <div class="hub-text-stack">
+                      <div class="hub-title">Creo</div>
+                      <div class="hub-subtitle">Orchestrator</div>
+                      <div class="hub-health-badge">
+                        <span class="hub-health-dot"></span>
+                        <span class="hub-health-label">Healthy</span>
+                      </div>
+                    </div>
+
+                  </div>
+                </div>
+
+                <!-- ========================================================
+                     6 RADIAL CYBERNETIC MICROSERVICE HUD CARDS
+                     ======================================================== -->
+                
+                <!-- 1. TOP: Frontend SPA (:4200) -->
+                <div id="nodeFrontend" class="cyber-service-card card-pos-top theme-cyan"
+                     data-name="Frontend SPA" data-role="Frontend SPA" data-port=":4200" data-pid="4820"
+                     data-cmd="npm run dev" data-desc="Vite React dev server with Hot Module Replacement on :4200.">
+                  <div class="card-icon-badge">
+                    <svg viewBox="0 0 52 52" width="40" height="40">
+                      <!-- Isometric Laptop Base -->
+                      <polygon points="6,34 26,42 46,34 26,26" fill="#0f172a" stroke="#38bdf8" stroke-width="1.4"/>
+                      <polygon points="12,33 26,38 40,33 26,28" fill="#1e293b"/>
+                      <!-- Isometric Screen Frame -->
+                      <polygon points="12,12 38,8 38,28 12,32" fill="#020617" stroke="#38bdf8" stroke-width="1.4"/>
+                      <!-- Screen Content / Code Brackets -->
+                      <polygon points="15,14 35,11 35,26 15,29" fill="#0369a1" opacity="0.85"/>
+                      <g fill="none" stroke="#e0f2fe" stroke-width="1.3" stroke-linecap="round">
+                        <path d="M 21 18 L 18 20 L 21 22"/>
+                        <path d="M 29 17 L 32 19 L 29 21"/>
+                        <line x1="26" y1="17" x2="24" y2="22"/>
+                      </g>
+                    </svg>
+                  </div>
+                  <div class="card-info-col">
+                    <div class="card-name-row">
+                      <span class="card-title">Frontend SPA</span>
+                    </div>
+                    <div class="card-port-row">:4200</div>
+                    <div class="card-metrics-row">48ms <span class="metric-divider">|</span> 99.9%</div>
+                    <div class="card-sparkline-row">
+                      <svg class="sparkline-svg" viewBox="0 0 90 14" preserveAspectRatio="none">
+                        <path class="sparkline-path" d="M0,8 Q15,1 30,8 T60,8 T90,6" fill="none" stroke="#38bdf8" stroke-width="1.8"/>
+                      </svg>
+                    </div>
+                  </div>
+                </div>
+
+                <!-- 2. TOP-RIGHT: Backend API (:8080) -->
+                <div id="nodeBackend" class="cyber-service-card card-pos-top-right theme-purple"
+                     data-name="Backend API" data-role="Backend API" data-port=":8080" data-pid="5120"
+                     data-cmd="go run main.go" data-desc="High-performance Go 1.23 REST API microservice compiled on :8080.">
+                  <div class="card-icon-badge">
+                    <svg viewBox="0 0 52 52" width="40" height="40">
+                      <!-- Isometric Server Unit 1 (Upper) -->
+                      <polygon points="26,6 44,14 26,22 8,14" fill="#6b21a8" stroke="#c084fc" stroke-width="1.2"/>
+                      <polygon points="8,14 26,22 26,28 8,20" fill="#4c1d95" stroke="#a855f7" stroke-width="1.2"/>
+                      <polygon points="26,22 44,14 44,20 26,28" fill="#581c87" stroke="#a855f7" stroke-width="1.2"/>
+                      <!-- Unit 1 Vent & LED -->
+                      <circle cx="14" cy="18" r="1.4" fill="#38bdf8"/>
+                      <circle cx="18" cy="19.5" r="1.4" fill="#34d399"/>
+                      <line x1="30" y1="23" x2="40" y2="18.5" stroke="#e9d5ff" stroke-width="1"/>
+
+                      <!-- Isometric Server Unit 2 (Lower) -->
+                      <polygon points="8,23 26,31 26,37 8,29" fill="#3b0764" stroke="#a855f7" stroke-width="1.2"/>
+                      <polygon points="26,31 44,23 44,29 26,37" fill="#4c1d95" stroke="#a855f7" stroke-width="1.2"/>
+                      <!-- Unit 2 Vent & LED -->
+                      <circle cx="14" cy="27" r="1.4" fill="#f43f5e"/>
+                      <circle cx="18" cy="28.5" r="1.4" fill="#38bdf8"/>
+                      <line x1="30" y1="32" x2="40" y2="27.5" stroke="#e9d5ff" stroke-width="1"/>
+                      <!-- Base Feet -->
+                      <rect x="12" y="32" width="3" height="4" fill="#1e1b4b"/>
+                      <rect x="36" y="32" width="3" height="4" fill="#1e1b4b"/>
+                    </svg>
+                  </div>
+                  <div class="card-info-col">
+                    <div class="card-name-row">
+                      <span class="card-title">Backend API</span>
+                    </div>
+                    <div class="card-port-row">:8080</div>
+                    <div class="card-metrics-row">61ms <span class="metric-divider">|</span> 99.8%</div>
+                    <div class="card-sparkline-row">
+                      <svg class="sparkline-svg" viewBox="0 0 90 14" preserveAspectRatio="none">
+                        <path class="sparkline-path" d="M0,7 Q12,2 25,9 T50,4 T75,9 T90,7" fill="none" stroke="#c084fc" stroke-width="1.8"/>
+                      </svg>
+                    </div>
+                  </div>
+                </div>
+
+                <!-- 3. BOTTOM-RIGHT: Redis Cache (:6379) -->
+                <div id="nodeRedis" class="cyber-service-card card-pos-bottom-right theme-red"
+                     data-name="Redis Cache" data-role="Redis Cache" data-port=":6379" data-pid="6379"
+                     data-cmd="docker compose up redis" data-desc="In-memory key-value cache and event pub/sub broker on :6379.">
+                  <div class="card-icon-badge">
+                    <svg viewBox="0 0 52 52" width="40" height="40">
+                      <!-- Tier 1 (Top Disc) -->
+                      <path d="M10,14 v5 c0,3.5 7.2,6 16,6 s16,-2.5 16,-6 v-5" fill="#be123c" stroke="#fb7185" stroke-width="1.2"/>
+                      <ellipse cx="26" cy="14" rx="16" ry="6" fill="#f43f5e" stroke="#fda4af" stroke-width="1.2"/>
+                      <line x1="20" y1="14" x2="32" y2="14" stroke="#ffffff" stroke-width="1.2" opacity="0.8"/>
+                      
+                      <!-- Tier 2 (Middle Disc) -->
+                      <path d="M10,22 v5 c0,3.5 7.2,6 16,6 s16,-2.5 16,-6 v-5" fill="#9f1239" stroke="#fb7185" stroke-width="1.2"/>
+                      <line x1="16" y1="26" x2="36" y2="26" stroke="#fda4af" stroke-width="1.2" opacity="0.6"/>
+
+                      <!-- Tier 3 (Bottom Disc) -->
+                      <path d="M10,30 v5 c0,3.5 7.2,6 16,6 s16,-2.5 16,-6 v-5" fill="#881337" stroke="#fb7185" stroke-width="1.2"/>
+                      <line x1="16" y1="34" x2="36" y2="34" stroke="#fda4af" stroke-width="1.2" opacity="0.6"/>
+                    </svg>
+                  </div>
+                  <div class="card-info-col">
+                    <div class="card-name-row">
+                      <span class="card-title">Redis Cache</span>
+                    </div>
+                    <div class="card-port-row">:6379</div>
+                    <div class="card-metrics-row">10ms <span class="metric-divider">|</span> 99.9%</div>
+                    <div class="card-sparkline-row">
+                      <svg class="sparkline-svg" viewBox="0 0 90 14" preserveAspectRatio="none">
+                        <path class="sparkline-path" d="M0,9 Q18,3 36,9 T72,5 T90,8" fill="none" stroke="#f43f5e" stroke-width="1.8"/>
+                      </svg>
+                    </div>
+                  </div>
+                </div>
+
+                <!-- 4. BOTTOM: Worker / Jobs (Async DAG) -->
+                <div id="nodeWorker" class="cyber-service-card card-pos-bottom theme-teal"
+                     data-name="Worker / Jobs" data-role="Worker / Jobs" data-port="Async DAG" data-pid="6210"
+                     data-cmd="creo worker start" data-desc="Asynchronous DAG job queue runner executing scheduled task batches.">
+                  <div class="card-icon-badge">
+                    <svg viewBox="0 0 52 52" width="40" height="40">
+                      <!-- 8-Point Geometric Gear/Crystal Star -->
+                      <polygon points="26,6 31,16 42,12 38,23 48,26 38,29 42,40 31,36 26,46 21,36 10,40 14,29 4,26 14,23 10,12 21,16" 
+                               fill="#065f46" stroke="#34d399" stroke-width="1.4" filter="drop-shadow(0 0 6px #10b981)"/>
+                      <!-- Inner Diamond Core -->
+                      <polygon points="26,14 36,26 26,38 16,26" fill="#047857" stroke="#6ee7b7" stroke-width="1.2"/>
+                      <circle cx="26" cy="26" r="4.5" fill="#a7f3d0"/>
+                    </svg>
+                  </div>
+                  <div class="card-info-col">
+                    <div class="card-name-row">
+                      <span class="card-title">Worker / Jobs</span>
+                    </div>
+                    <div class="card-port-row">Async DAG</div>
+                    <div class="card-metrics-row">112ms <span class="metric-divider">|</span> 99.7%</div>
+                    <div class="card-sparkline-row">
+                      <svg class="sparkline-svg" viewBox="0 0 90 14" preserveAspectRatio="none">
+                        <path class="sparkline-path" d="M0,6 Q16,11 32,5 T64,8 T90,4" fill="none" stroke="#10b981" stroke-width="1.8"/>
+                      </svg>
+                    </div>
+                  </div>
+                </div>
+
+                <!-- 5. BOTTOM-LEFT: PostgreSQL (:5432) -->
+                <div id="nodeDatabase" class="cyber-service-card card-pos-bottom-left theme-blue"
+                     data-name="PostgreSQL" data-role="PostgreSQL" data-port=":5432" data-pid="5432"
+                     data-cmd="docker compose up db" data-desc="Containerized PostgreSQL 16 relational database with volume persistence.">
+                  <div class="card-icon-badge">
+                    <svg viewBox="0 0 52 52" width="40" height="40">
+                      <!-- 3D Isometric Database Cube -->
+                      <polygon points="26,8 44,17 26,26 8,17" fill="#2563eb" stroke="#93c5fd" stroke-width="1.3"/>
+                      <polygon points="8,17 26,26 26,44 8,35" fill="#1d4ed8" stroke="#60a5fa" stroke-width="1.3"/>
+                      <polygon points="26,26 44,17 44,35 26,44" fill="#1e40af" stroke="#3b82f6" stroke-width="1.3"/>
+                      <!-- Elephant Face Silhouette Emblem -->
+                      <g fill="none" stroke="#ffffff" stroke-width="1.3" stroke-linecap="round" stroke-linejoin="round">
+                        <path d="M 14,24 C 14,21 21,21 21,25 C 21,29 17,31 17,34"/>
+                        <path d="M 16,23 C 12,23 11,26 13,29 C 14,30 16,30 16,28"/>
+                        <circle cx="18" cy="24" r="0.8" fill="#ffffff"/>
+                      </g>
+                    </svg>
+                  </div>
+                  <div class="card-info-col">
+                    <div class="card-name-row">
+                      <span class="card-title">PostgreSQL</span>
+                    </div>
+                    <div class="card-port-row">:5432</div>
+                    <div class="card-metrics-row">12ms <span class="metric-divider">|</span> 99.9%</div>
+                    <div class="card-sparkline-row">
+                      <svg class="sparkline-svg" viewBox="0 0 90 14" preserveAspectRatio="none">
+                        <path class="sparkline-path" d="M0,8 Q14,3 28,9 T56,4 T90,7" fill="none" stroke="#3b82f6" stroke-width="1.8"/>
+                      </svg>
+                    </div>
+                  </div>
+                </div>
+
+                <!-- 6. TOP-LEFT: File Storage (S3 · Assets) -->
+                <div id="nodeStorage" class="cyber-service-card card-pos-top-left theme-violet"
+                     data-name="File Storage" data-role="File Storage" data-port="S3 · Assets" data-pid="6890"
+                     data-cmd="docker compose up s3" data-desc="Local S3-compatible MinIO object store and asset storage emulator.">
+                  <div class="card-icon-badge">
+                    <svg viewBox="0 0 52 52" width="40" height="40">
+                      <!-- 3D Isometric Storage Crate / Cube Container -->
+                      <polygon points="26,8 44,17 26,26 8,17" fill="#9333ea" stroke="#e9d5ff" stroke-width="1.3"/>
+                      <polygon points="8,17 26,26 26,44 8,35" fill="#6b21a8" stroke="#c084fc" stroke-width="1.3"/>
+                      <polygon points="26,26 44,17 44,35 26,44" fill="#581c87" stroke="#a855f7" stroke-width="1.3"/>
+                      <!-- Recessed Geometric Handle Slots -->
+                      <polygon points="13,24 20,28 20,33 13,29" fill="#3b0764" stroke="#e9d5ff" stroke-width="1"/>
+                      <polygon points="32,28 39,24 39,29 32,33" fill="#3b0764" stroke="#e9d5ff" stroke-width="1"/>
+                    </svg>
+                  </div>
+                  <div class="card-info-col">
+                    <div class="card-name-row">
+                      <span class="card-title">File Storage</span>
+                    </div>
+                    <div class="card-port-row">S3 · Assets</div>
+                    <div class="card-metrics-row">35ms <span class="metric-divider">|</span> 99.9%</div>
+                    <div class="card-sparkline-row">
+                      <svg class="sparkline-svg" viewBox="0 0 90 14" preserveAspectRatio="none">
+                        <path class="sparkline-path" d="M0,7 Q15,12 30,6 T60,8 T90,5" fill="none" stroke="#a855f7" stroke-width="1.8"/>
+                      </svg>
+                    </div>
+                  </div>
+                </div>
+
+              </div>
+
+
+            </div>
+          </div>
+
+          <!-- 3D HUD Top Bar -->
+          <div class="hud-top-bar">
+            <div class="hud-telemetry">
+              <span class="hud-indicator"><span class="tiny-dot green"></span> 3D SPATIAL MATRIX</span>
+              <span class="hud-stat">SERVICES: <strong class="counter-num" data-target="4" data-suffix=" ONLINE">4 ONLINE</strong></span>
+              <span class="hud-stat">BOOT: <strong class="counter-num" data-target="162" data-suffix="ms">162ms</strong></span>
+            </div>
+
+            <!-- 3D Camera Preset View Selector -->
+            <div class="hud-camera-controls">
+              <button class="hud-btn active" data-cam="overview">Overview</button>
+              <button class="hud-btn" data-cam="frontend">Frontend (:4200)</button>
+              <button class="hud-btn" data-cam="backend">Backend (:8080)</button>
+              <button class="hud-btn" data-cam="database">DB (:5432)</button>
+              <button class="hud-btn" data-cam="reset" id="hudResetCam">⟲ Reset</button>
+            </div>
+          </div>
+
+          <!-- 3D Interactive Inspection Card (Updates on 3D hover/click) -->
+          <div class="hud-inspector-card" id="hudInspector">
+            <div class="inspector-header">
+              <span class="inspector-dot" id="inspDot"></span>
+              <span class="inspector-title" id="inspTitle">CREO ROOT ORCHESTRATOR</span>
+              <span class="inspector-tag" id="inspTag">ACTIVE</span>
+            </div>
+            <div class="inspector-desc" id="inspDesc">
+              Central orchestrator. Resolves dependency graph from creo.yml and executes atomic wt.exe invocation.
+            </div>
+            <div class="inspector-meta" id="inspMeta">
+              <span>Port: <strong>Root</strong></span>
+              <span>PID: <strong>Core</strong></span>
+              <span>Command: <code>$ creo up --all</code></span>
+            </div>
+          </div>
+
+          <!-- 3D Bottom Interaction Hints -->
+          <div class="hud-bottom-bar">
+            <span style="display:inline-flex; align-items:center; gap:6px;">
+              <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                <rect x="5" y="2" width="14" height="20" rx="7"></rect>
+                <line x1="12" y1="6" x2="12" y2="10"></line>
+              </svg>
+              Click & Drag to Orbit in 3D
+            </span>
+            <span>•</span>
+            <span>Hover or Click any 3D node to inspect</span>
+            <span>•</span>
+            <span>Scroll to Fly Camera</span>
+          </div>
+
+        </div>
+
+      </div>
+    </section>
+
+    <!-- High-Velocity Infinite Marquee Ticker 1 -->
+    <div class="marquee-ticker-wrap" aria-hidden="true">
+      <div class="marquee-track">
+        <span class="m-item"><span class="m-dot"></span> GOLANG 1.23 COMPILED</span>
+        <span class="m-item"><span class="m-dot purple"></span> &lt;180MS COLD BOOT</span>
+        <span class="m-item"><span class="m-dot"></span> WT.EXE PROTOCOL</span>
+        <span class="m-item"><span class="m-dot green"></span> ZERO ORPHANED PORTS</span>
+        <span class="m-item"><span class="m-dot"></span> TRANSACTIONAL PID GUARDIAN</span>
+        <span class="m-item"><span class="m-dot purple"></span> 100% DECLARATIVE CREO.YML</span>
+        <span class="m-item"><span class="m-dot"></span> LIP GLOSS ANSI COLOR(99)</span>
+        <span class="m-item"><span class="m-dot green"></span> PRE-FLIGHT COLLISION SENTINEL</span>
+        <span class="m-item"><span class="m-dot"></span> NO TELEMETRY • ZERO BLOAT</span>
+        <!-- Duplicated for seamless loop -->
+        <span class="m-item"><span class="m-dot"></span> GOLANG 1.23 COMPILED</span>
+        <span class="m-item"><span class="m-dot purple"></span> &lt;180MS COLD BOOT</span>
+        <span class="m-item"><span class="m-dot"></span> WT.EXE PROTOCOL</span>
+        <span class="m-item"><span class="m-dot green"></span> ZERO ORPHANED PORTS</span>
+        <span class="m-item"><span class="m-dot"></span> TRANSACTIONAL PID GUARDIAN</span>
+        <span class="m-item"><span class="m-dot purple"></span> 100% DECLARATIVE CREO.YML</span>
+        <span class="m-item"><span class="m-dot"></span> LIP GLOSS ANSI COLOR(99)</span>
+        <span class="m-item"><span class="m-dot green"></span> PRE-FLIGHT COLLISION SENTINEL</span>
+        <span class="m-item"><span class="m-dot"></span> NO TELEMETRY • ZERO BLOAT</span>
+      </div>
+    </div>
+
+    <!-- ====================================================================
+         SECTION 02: THE ICONIC 3D HALFTONE CREO WORDMARK
+         ==================================================================== -->
+    <section class="ascii-lab-section scroll-section" id="ascii-lab">
+      <div class="container">
+        
+        <div class="section-header anim-reveal">
+          <span class="section-tag">02 · CLI RUNTIME IDENTITY · 3D HALFTONE</span>
+          <h2 class="section-title">The Creo Monolith Wordmark</h2>
+          <p class="section-subtitle">
+            Authentic modular keycap typography rendered through real-time WebGL halftone post-processing shaders. Floating in studio inertia — type <kbd class="keyboard-key" style="background:#1e1430;border:1px solid #a855f7;border-radius:4px;padding:2px 8px;font-family:var(--font-mono);font-size:0.75rem;color:#f5d0fe;">creo</kbd> on your keyboard to unlock the White Edition.
+          </p>
+        </div>
+
+        <div class="dither-wordmark-container anim-reveal" id="ditherWordmarkContainer">
+          
+          <div class="dither-studio-card" id="ditherStudioCard">
+            <div class="dither-toolbar">
+              <div class="dither-title-wrap">
+                <div class="mac-dots">
+                  <span class="m-dot red"></span>
+                  <span class="m-dot yellow"></span>
+                  <span class="m-dot green"></span>
+                </div>
+                <span class="tiny-dot purple pulse-anim" style="margin-left:6px;"></span>
+                <span class="dither-toolbar-title">CREO 3D HALFTONE WORDMARK</span>
+              </div>
+              <div class="dither-controls-pills">
+                <span class="dither-pill-btn active" id="btnDitherHalftone" title="Rotated Halftone Dots Shader">Halftone</span>
+              </div>
+            </div>
+
+            <div class="dither-canvas-wrapper" id="ditherWrapper">
+              <canvas id="ditherCanvas" class="dither-viewport-canvas"></canvas>
+
+              <!-- White Terminal ASCII Banner Overlay (Revealed via 'creo' Easter Egg) -->
+              <div class="terminal-white-overlay" id="terminalWhiteOverlay" role="region" aria-label="Creo White Terminal Banner" tabindex="0">
+                <div class="ascii-dom-underlay" id="asciiDomUnderlay">
+                  <pre class="ascii-art-pre" id="asciiArtPre"><code id="asciiArtCode"> ██████╗██████╗ ███████╗ ██████╗
+██╔════╝██╔══██╗██╔════╝██╔═══██╗
+██║     ██████╔╝█████╗  ██║   ██║
+██║     ██╔══██╗██╔══╝  ██║   ██║
+╚██████╗██║  ██║███████╗╚██████╔╝
+ ╚═════╝╚═╝  ╚═╝╚══════╝ ╚═════╝</code></pre>
+                  <div class="ascii-meta-labels" id="asciiMetaLabels">
+                    <span class="ascii-sub-1" id="asciiSub1">  Welcome to Creo</span>
+                    <span class="ascii-sub-2" id="asciiSub2">  v0.4.0</span>
+                  </div>
+                </div>
+              </div>
+
+              <div class="dither-hint-overlay" id="ditherHintOverlay">
+                <span>Floating Inertia · Staggered Buoyancy · Type "creo" for Easter Egg</span>
+              </div>
+            </div>
+
+            <div class="dither-footer-info">
+              <div class="dither-pill"><span class="tiny-dot blue"></span> 3D Geometry: <strong>Extruded Keycap Glyphs (C · R · E · O)</strong></div>
+              <div class="dither-pill"><span class="tiny-dot purple"></span> Shading: <strong>GLSL3 Post-Process</strong></div>
+              <div class="dither-pill"><span class="tiny-dot green"></span> Active Mode: <strong id="activeDitherModeText">Halftone Dots</strong></div>
+              <div class="dither-pill" id="themeStatusPill"><span class="tiny-dot purple" id="themeStatusDot"></span> Edition: <strong id="themeStatusText">Neon Violet</strong></div>
+            </div>
+          </div>
+
+        </div>
+
+      </div>
+    </section>
+
+    <!-- ====================================================================
+         SECTION 03: THE PROBLEM — "Stop starting services one by one."
+         ==================================================================== -->
+    <section class="problem-section scroll-section" id="problem">
+      <div class="container">
+        
+        <div class="section-header anim-reveal">
+          <span class="section-tag">02 · WORKFLOW FRICTION</span>
+          <h2 class="section-title">Stop starting services one by one.</h2>
+          <p class="section-subtitle">
+            Every morning begins with the same painful ritual: clicking around 4 folders, opening separate terminal windows, and wondering why port 8080 is already locked.
+          </p>
+        </div>
+
+        <div class="comparison-grid">
+          <!-- The Painful Old Way -->
+          <div class="compare-card compare-old anim-reveal">
+            <div class="compare-badge badge-danger">
+              <span class="b-dot red"></span>
+              Without Creo (Terminal Chaos)
+            </div>
+            <div class="scattered-windows-visual">
+              <div class="scatter-win win-1">
+                <div class="win-bar">
+                  <span class="win-dot red"></span>
+                  <span class="win-dot yellow"></span>
+                  <span class="win-dot green"></span>
+                  <span class="win-title">cmd.exe — cd client && npm run dev</span>
+                </div>
+                <div class="win-log">Port 3000 in use. Trying 3001... [FAILED]</div>
+              </div>
+              <div class="scatter-win win-2">
+                <div class="win-bar">
+                  <span class="win-dot red"></span>
+                  <span class="win-dot yellow"></span>
+                  <span class="win-dot green"></span>
+                  <span class="win-title">powershell.exe — cd api && ./mvnw</span>
+                </div>
+                <div class="win-log">Exception: Address already bound: bind 8080</div>
+              </div>
+              <div class="scatter-win win-3">
+                <div class="win-bar">
+                  <span class="win-dot red"></span>
+                  <span class="win-dot yellow"></span>
+                  <span class="win-dot green"></span>
+                  <span class="win-title">git-bash.exe — docker compose up -d</span>
+                </div>
+                <div class="win-log">Error response from daemon: driver failed...</div>
+              </div>
+            </div>
+            <ul class="compare-points">
+              <li><span class="pt-icon bad">✕</span> 4+ cluttered, overlapping terminal windows lost in taskbars</li>
+              <li><span class="pt-icon bad">✕</span> Manual directory navigation and forgotten environment variables</li>
+              <li><span class="pt-icon bad">✕</span> Ghost background processes and painful taskkill /F port hunting</li>
+            </ul>
+          </div>
+
+          <!-- The Creo Transformation -->
+          <div class="compare-card compare-new anim-reveal">
+            <div class="compare-badge badge-success">
+              <span class="b-dot green"></span>
+              With Creo (Unified Single-Command)
+            </div>
+            <div class="creo-converge-visual">
+              <div class="single-command-box">
+                <span class="prompt-arrow">➜</span>
+                <code>creo up</code>
+                <span class="speed-stamp" style="display:inline-flex; align-items:center; gap:4px;">
+                  <svg width="11" height="11" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
+                    <polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"></polygon>
+                  </svg>
+                  160ms execution
+                </span>
+              </div>
+              <div class="terminal-tab-preview">
+                <div class="wt-tab-bar">
+                  <div class="wt-tab active" data-tab-preview="0">
+                    <span class="tab-dot green"></span>
+                    <span>Frontend (:4200)</span>
+                  </div>
+                  <div class="wt-tab" data-tab-preview="1">
+                    <span class="tab-dot green"></span>
+                    <span>Backend (:8080)</span>
+                  </div>
+                  <div class="wt-tab" data-tab-preview="2">
+                    <span class="tab-dot green"></span>
+                    <span>Postgres (:5432)</span>
+                  </div>
+                </div>
+                <div class="wt-tab-content">
+                  <div class="wt-log-line"><span class="t-purple">[creo]</span> Chained 3 service tabs inside Windows Terminal</div>
+                  <div class="wt-log-line"><span class="t-green">[creo]</span> Transactional PID registration confirmed in .creo/pids.json</div>
+                  <div class="wt-log-line"><span class="t-fuchsia">[creo]</span> Pre-flight port checks passed with zero collisions</div>
+                  <div class="wt-log-line t-highlight"><span class="t-green">✔</span> Entire environment active and isolated in a single window.</div>
+                </div>
+              </div>
+            </div>
+            <ul class="compare-points">
+              <li><span class="pt-icon good">✔</span> One single command boots your entire multi-service stack</li>
+              <li><span class="pt-icon good">✔</span> Clean Windows Terminal tabs with dedicated working directories</li>
+              <li><span class="pt-icon good">✔</span> Transactional PID registry guarantees 100% clean teardowns</li>
+            </ul>
+          </div>
+        </div>
+
+      </div>
+    </section>
+
+    <!-- ====================================================================
+         SECTION 03: ARCHITECTURE BENTO GRID — Engineered for Speed
+         ==================================================================== -->
+    <section class="bento-section scroll-section" id="bento">
+      <div class="container">
+        
+        <div class="section-header anim-reveal">
+          <span class="section-tag">03 · PERFORMANCE ARCHITECTURE</span>
+          <h2 class="section-title">Engineered with Go. Zero bloat.</h2>
+          <p class="section-subtitle">
+            Crafted for speed, resilience, and native Windows Terminal ergonomics. No heavy node runtimes, no electron wrappers, no telemetry.
+          </p>
+        </div>
+
+        <div class="bento-grid">
+          
+          <!-- Bento 1: Ultra-Fast Go Engine -->
+          <div class="bento-card bento-hero-feature anim-reveal">
+            <div class="bento-badge">Go 1.23+ Runtime</div>
+            <div class="bento-icon-wrapper">
+              <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"></polygon>
+              </svg>
+            </div>
+            <h3>Sub-200ms Execution</h3>
+            <p>
+              Compiled to a lean, self-contained native binary. Starts up instantly, evaluates dependency DAGs, and triggers terminal tabs before your eyes can blink.
+            </p>
+            <div class="bento-metric-row">
+              <div class="metric-item">
+                <span class="metric-val text-green counter-num" data-target="180" data-prefix="< " data-suffix="ms">&lt; 180ms</span>
+                <span class="metric-lbl">Cold Boot</span>
+              </div>
+              <div class="metric-item">
+                <span class="metric-val text-purple counter-num" data-target="14.8" data-decimals="1" data-suffix=" MB">14.8 MB</span>
+                <span class="metric-lbl">Binary Size</span>
+              </div>
+              <div class="metric-item">
+                <span class="metric-val counter-num" data-target="0" data-suffix=" kb">0 kb</span>
+                <span class="metric-lbl">Telemetry Sent</span>
+              </div>
+            </div>
+          </div>
+
+          <!-- Bento 2: Windows Terminal Native Integration -->
+          <div class="bento-card anim-reveal">
+            <div class="bento-badge">wt.exe Orchestration</div>
+            <div class="bento-icon-wrapper">
+              <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <rect x="2" y="3" width="20" height="14" rx="2" ry="2"></rect>
+                <line x1="8" y1="21" x2="16" y2="21"></line>
+                <line x1="12" y1="17" x2="12" y2="21"></line>
+              </svg>
+            </div>
+            <h3>Native wt.exe Chaining</h3>
+            <p>
+              Harnesses Windows Terminal's command-line protocol to spawn tabs with custom titles, working directories, and color accents in one atomic call.
+            </p>
+            <div class="bento-code-snippet">
+              <code>wt.exe -w 0 nt -d ./api -t "Backend" ; nt -d ./web -t "UI"</code>
+            </div>
+          </div>
+
+          <!-- Bento 3: Transactional PID Management -->
+          <div class="bento-card anim-reveal">
+            <div class="bento-badge">Process Guardian</div>
+            <div class="bento-icon-wrapper">
+              <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"></path>
+              </svg>
+            </div>
+            <h3>Transactional PID Registry</h3>
+            <p>
+              Records every spawned process tree in <code>.creo/pids.json</code>. When you run <code>creo stop</code>, all child process subtrees terminate gracefully.
+            </p>
+            <div class="pid-status-pills">
+              <span class="pid-pill"><span class="tiny-dot green"></span> PID 14280 (Clean)</span>
+              <span class="pid-pill"><span class="tiny-dot green"></span> PID 19844 (Clean)</span>
+              <span class="pid-pill"><span class="tiny-dot green"></span> PID 8412 (Clean)</span>
+            </div>
+          </div>
+
+          <!-- Bento 4: Pre-Flight Port Collision Sentinel -->
+          <div class="bento-card bento-wide anim-reveal">
+            <div class="bento-badge">Port Collision Sentinel</div>
+            <div class="bento-icon-wrapper">
+              <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <circle cx="12" cy="12" r="10"></circle>
+                <line x1="12" y1="8" x2="12" y2="12"></line>
+                <line x1="12" y1="16" x2="12.01" y2="16"></line>
+              </svg>
+            </div>
+            <div class="bento-wide-content">
+              <div>
+                <h3>Pre-Flight Port Sentinel</h3>
+                <p>
+                  Before launching any service, Creo verifies whether required ports (3000, 8080, 5432, etc.) are available. If a zombie process holds a port, Creo alerts you with the exact locking PID before crashing.
+                </p>
+              </div>
+              <div class="port-radar-visual">
+                <div class="radar-item ok"><span>:4200</span> <span class="tag-ok">FREE</span></div>
+                <div class="radar-item ok"><span>:8080</span> <span class="tag-ok">FREE</span></div>
+                <div class="radar-item ok"><span>:5432</span> <span class="tag-ok">FREE</span></div>
+                <div class="radar-item ok"><span>:6379</span> <span class="tag-ok">FREE</span></div>
+              </div>
+            </div>
+          </div>
+
+        </div>
+
+      </div>
+    </section>
+
+    <!-- High-Velocity Infinite Marquee Ticker 2 (Reverse Stream) -->
+    <div class="marquee-ticker-wrap" aria-hidden="true">
+      <div class="marquee-track reverse">
+        <span class="m-item"><span class="m-dot purple"></span> VITE / REACT</span>
+        <span class="m-item"><span class="m-dot"></span> NEXT.JS 14</span>
+        <span class="m-item"><span class="m-dot green"></span> GO / FIBER / GIN</span>
+        <span class="m-item"><span class="m-dot"></span> SPRING BOOT 3</span>
+        <span class="m-item"><span class="m-dot purple"></span> FASTAPI / PYTHON</span>
+        <span class="m-item"><span class="m-dot"></span> NESTJS / NODE</span>
+        <span class="m-item"><span class="m-dot green"></span> POSTGRESQL 16</span>
+        <span class="m-item"><span class="m-dot"></span> REDIS IN-MEMORY</span>
+        <span class="m-item"><span class="m-dot purple"></span> DOCKER COMPOSE</span>
+        <!-- Duplicated for seamless loop -->
+        <span class="m-item"><span class="m-dot purple"></span> VITE / REACT</span>
+        <span class="m-item"><span class="m-dot"></span> NEXT.JS 14</span>
+        <span class="m-item"><span class="m-dot green"></span> GO / FIBER / GIN</span>
+        <span class="m-item"><span class="m-dot"></span> SPRING BOOT 3</span>
+        <span class="m-item"><span class="m-dot purple"></span> FASTAPI / PYTHON</span>
+        <span class="m-item"><span class="m-dot"></span> NESTJS / NODE</span>
+        <span class="m-item"><span class="m-dot green"></span> POSTGRESQL 16</span>
+        <span class="m-item"><span class="m-dot"></span> REDIS IN-MEMORY</span>
+        <span class="m-item"><span class="m-dot purple"></span> DOCKER COMPOSE</span>
+      </div>
+    </div>
+
+    <!-- ====================================================================
+         SECTION 04: HOW IT WORKS — Three Stages
+         ==================================================================== -->
+    <section class="how-section scroll-section" id="how-it-works">
+      <div class="container">
+        
+        <div class="section-header anim-reveal">
+          <span class="section-tag">04 · WORKFLOW STAGES</span>
+          <h2 class="section-title">From zero to ready-to-code.</h2>
+          <p class="section-subtitle">Three declarative steps designed to remove setup friction completely.</p>
+        </div>
+
+        <div class="stages-timeline">
+          <!-- Stage 1 -->
+          <div class="stage-card anim-reveal">
+            <div class="stage-step">01</div>
+            <div class="stage-code-pill">
+              <code>creo init</code>
+            </div>
+            <h3>Auto-Detect Architecture</h3>
+            <p>
+              Creo scans your repository 3 directories deep. It recognizes <code>package.json</code>, <code>pom.xml</code>, <code>go.mod</code>, <code>Cargo.toml</code>, and <code>docker-compose.yml</code>.
+            </p>
+            <div class="stage-mini-box">
+              <span class="tag-auto">Detects 40+ Frameworks</span>
+            </div>
+          </div>
+
+          <div class="stage-connector" aria-hidden="true">
+            <svg width="44" height="20" viewBox="0 0 44 20" fill="none" class="stage-arrow-svg">
+              <defs>
+                <linearGradient id="stageFlowGrad1" x1="0%" y1="0%" x2="100%" y2="0%">
+                  <stop offset="0%" stop-color="#ffffff" stop-opacity="0.25"/>
+                  <stop offset="100%" stop-color="#a855f7" stop-opacity="1"/>
+                </linearGradient>
+              </defs>
+              <line x1="2" y1="10" x2="34" y2="10" stroke="url(#stageFlowGrad1)" stroke-width="1.75" class="stage-arrow-line"/>
+              <polyline points="30,5 38,10 30,15" fill="none" stroke="#a855f7" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"/>
+            </svg>
+          </div>
+
+          <!-- Stage 2 -->
+          <div class="stage-card anim-reveal">
+            <div class="stage-step">02</div>
+            <div class="stage-code-pill">
+              <code>creo.yml</code>
+            </div>
+            <h3>Generate Clean YAML</h3>
+            <p>
+              Outputs a human-readable, version-controllable configuration file defining project name, service directories, startup commands, and workflows.
+            </p>
+            <div class="stage-mini-box">
+              <span class="tag-version">Version-Controlled YAML</span>
+            </div>
+          </div>
+
+          <div class="stage-connector" aria-hidden="true">
+            <svg width="44" height="20" viewBox="0 0 44 20" fill="none" class="stage-arrow-svg">
+              <defs>
+                <linearGradient id="stageFlowGrad2" x1="0%" y1="0%" x2="100%" y2="0%">
+                  <stop offset="0%" stop-color="#ffffff" stop-opacity="0.25"/>
+                  <stop offset="100%" stop-color="#a855f7" stop-opacity="1"/>
+                </linearGradient>
+              </defs>
+              <line x1="2" y1="10" x2="34" y2="10" stroke="url(#stageFlowGrad2)" stroke-width="1.75" class="stage-arrow-line"/>
+              <polyline points="30,5 38,10 30,15" fill="none" stroke="#a855f7" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"/>
+            </svg>
+          </div>
+
+          <!-- Stage 3 -->
+          <div class="stage-card anim-reveal">
+            <div class="stage-step">03</div>
+            <div class="stage-code-pill">
+              <code>creo up</code>
+            </div>
+            <h3>Atomic Multi-Tab Launch</h3>
+            <p>
+              Launches an atomic Windows Terminal instance. All services boot simultaneously in organized tabs with full environment isolation.
+            </p>
+            <div class="stage-mini-box">
+              <span class="tag-ready">Ready in &lt; 180ms</span>
+            </div>
+          </div>
+        </div>
+
+      </div>
+    </section>
+
+    <!-- ====================================================================
+         SECTION 05: INTERACTIVE CONFIGURATOR — Build & Preview creo.yml
+         ==================================================================== -->
+    <section class="configurator-section scroll-section" id="configurator">
+      <div class="container">
+        
+        <div class="section-header anim-reveal">
+          <span class="section-tag">05 · INTERACTIVE WORKBENCH</span>
+          <h2 class="section-title">Build your creo.yml live.</h2>
+          <p class="section-subtitle">
+            Select your stack components below to see how Creo models your microservice workspace using the real Go CLI schema.
+          </p>
+        </div>
+
+        <div class="configurator-layout anim-reveal">
+          
+          <!-- Stack Selectors Controls -->
+          <div class="config-controls">
+            <div class="control-group">
+              <label class="control-label">Frontend Service</label>
+              <div class="chip-options" id="frontendChips">
+                <button class="chip-btn active" data-type="frontend" data-val="vite">Vite / React (:4200)</button>
+                <button class="chip-btn" data-type="frontend" data-val="next">Next.js 14 (:3000)</button>
+                <button class="chip-btn" data-type="frontend" data-val="angular">Angular 17 (:4200)</button>
+                <button class="chip-btn" data-type="frontend" data-val="svelte">SvelteKit (:5173)</button>
+              </div>
+            </div>
+
+            <div class="control-group">
+              <label class="control-label">Backend Service</label>
+              <div class="chip-options" id="backendChips">
+                <button class="chip-btn active" data-type="backend" data-val="go">Go API (:8080)</button>
+                <button class="chip-btn" data-type="backend" data-val="spring">Spring Boot (:8080)</button>
+                <button class="chip-btn" data-type="backend" data-val="fastapi">FastAPI / Python (:8000)</button>
+                <button class="chip-btn" data-type="backend" data-val="nest">NestJS / Node (:3001)</button>
+              </div>
+            </div>
+
+            <div class="control-group">
+              <label class="control-label">Databases & Infrastructure</label>
+              <div class="chip-options" id="dataChips">
+                <button class="chip-btn active" data-type="database" data-val="postgres">PostgreSQL 16 (:5432)</button>
+                <button class="chip-btn active" data-type="database" data-val="redis">Redis Cache (:6379)</button>
+                <button class="chip-btn" data-type="database" data-val="docker">Docker Compose</button>
+              </div>
+            </div>
+
+            <div class="config-tip">
+              <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <circle cx="12" cy="12" r="10"></circle>
+                <line x1="12" y1="16" x2="12" y2="12"></line>
+                <line x1="12" y1="8" x2="12.01" y2="8"></line>
+              </svg>
+              <span>Tip: Save this generated file as <code>creo.yml</code> in your repository root.</span>
+            </div>
+          </div>
+
+          <!-- Dynamic YAML & Tab Preview Pane -->
+          <div class="config-preview-panel">
+            <div class="preview-header">
+              <div class="preview-tabs">
+                <button class="prev-tab-btn active" id="btnShowYaml">creo.yml</button>
+                <button class="prev-tab-btn" id="btnShowWt">Windows Terminal Tabs</button>
+              </div>
+              <button class="btn btn-copy-snippet" id="copyConfigYamlBtn" title="Copy YAML to clipboard">
+                <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                  <rect x="9" y="9" width="13" height="13" rx="2" ry="2"></rect>
+                  <path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"></path>
+                </svg>
+                <span>Copy YAML</span>
+              </button>
+            </div>
+
+            <!-- View 1: Authentic YAML Output matching Go schema -->
+            <pre class="yaml-code-view" id="yamlCodeView"><code>project:
+  name: my-app
+
+services:
+  frontend:
+    path: web
+    command: npm run dev
+  backend:
+    path: api
+    command: go run main.go
+  postgres:
+    path: infra
+    command: docker compose up postgres
+  redis:
+    path: infra
+    command: docker compose up redis
+
+workflows:
+  dev:
+    - frontend
+    - backend
+    - postgres
+    - redis</code></pre>
+
+            <!-- View 2: Simulated Windows Terminal Tabs Layout -->
+            <div class="wt-live-preview hidden" id="wtLivePreview">
+              <div class="wt-live-tab-bar" id="wtDynamicTabs">
+                <!-- Dynamically rendered tabs -->
+              </div>
+              <div class="wt-live-body" id="wtDynamicBody">
+                <!-- Dynamically updated preview log -->
+              </div>
+            </div>
+
+          </div>
+
+        </div>
+
+      </div>
+    </section>
+
+    <!-- ====================================================================
+         SECTION 06: INTERACTIVE DEMO — Live CLI Terminal Simulator
+         ==================================================================== -->
+    <section class="demo-section scroll-section" id="demo">
+      <div class="container">
+        
+        <div class="section-header anim-reveal">
+          <span class="section-tag">06 · INTERACTIVE TERMINAL</span>
+          <h2 class="section-title">Your environment. Under control.</h2>
+          <p class="section-subtitle">
+            Click through documented scenarios or type commands directly into the interactive terminal prompt below.
+          </p>
+        </div>
+
+        <div class="demo-card anim-reveal">
+          <!-- Terminal Controls Header -->
+          <div class="demo-terminal-bar">
+            <div class="mac-dots">
+              <span class="m-dot red"></span>
+              <span class="m-dot yellow"></span>
+              <span class="m-dot green"></span>
+            </div>
+            
+            <div class="cmd-selectors">
+              <button class="cmd-tab btn-auto-demo" id="autoDemoBtn"><svg width="10" height="10" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true" style="margin-right:2px;"><polygon points="5 3 19 12 5 21 5 3"></polygon></svg> Auto-Play Simulation</button>
+              <button class="cmd-tab" data-cmd="init">creo init</button>
+              <button class="cmd-tab" data-cmd="up">creo up</button>
+              <button class="cmd-tab active" data-cmd="status">creo status</button>
+              <button class="cmd-tab" data-cmd="restart">creo restart</button>
+              <button class="cmd-tab" data-cmd="stop">creo stop</button>
+              <button class="cmd-tab" data-cmd="doctor">creo doctor</button>
+              <button class="cmd-tab btn-cmd-drop" data-cmd="drop">creo drop</button>
+            </div>
+
+            <div class="sim-label">
+              <span class="sim-pulse"></span>
+              LIVE CLI SHELL
+            </div>
+          </div>
+
+          <!-- Interactive Output Screen -->
+          <div class="demo-terminal-screen" id="demoScreen" tabindex="0" role="region" aria-label="Terminal Output Screen">
+            <!-- Rendered by JavaScript -->
+          </div>
+
+          <!-- Direct User Input Bar -->
+          <div class="demo-input-bar">
+            <span class="input-prompt">➜ creo-demo $</span>
+            <input type="text" id="terminalInteractiveInput" class="terminal-text-input" placeholder="Type a command (e.g. 'creo init', 'creo up', 'creo status', 'creo drop')..." autocomplete="off" spellcheck="false">
+            <button class="btn btn-terminal-exec" id="terminalExecBtn">Run ↵</button>
+          </div>
+        </div>
+
+      </div>
+    </section>
+
+    <!-- ====================================================================
+         SECTION 07: ECOSYSTEM — 40+ Stacks Supported
+         ==================================================================== -->
+    <section class="ecosystem-section scroll-section" id="ecosystem">
+      <div class="container">
+        
+        <div class="section-header anim-reveal">
+          <span class="section-tag">07 · STACK COMPATIBILITY</span>
+          <h2 class="section-title">40+ frameworks. One workflow.</h2>
+          <p class="section-subtitle">
+            Supported toolchains illuminate dynamically. From full-stack SPAs to polyglot microservice clusters, Creo auto-detects build manifests.
+          </p>
+        </div>
+
+        <!-- Filter Buttons -->
+        <div class="eco-filter-bar anim-reveal">
+          <button class="eco-filter-btn active" data-filter="all">All Stacks (18)</button>
+          <button class="eco-filter-btn" data-filter="frontend">Frontend & SPAs</button>
+          <button class="eco-filter-btn" data-filter="backend">Backend & Microservices</button>
+          <button class="eco-filter-btn" data-filter="data">Databases & Ops</button>
+        </div>
+
+        <!-- Constellation Grid of Technologies (Option 1: Vector SVGs + Manifests) -->
+        <div class="constellation-grid anim-reveal" id="constellationGrid">
+          <!-- 1. Frontend & SPAs -->
+          <div class="stack-node" data-cat="frontend">
+            <svg class="tech-icon tech-react" viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="1.8">
+              <ellipse cx="12" cy="12" rx="4" ry="10" transform="rotate(30 12 12)"/>
+              <ellipse cx="12" cy="12" rx="4" ry="10" transform="rotate(90 12 12)"/>
+              <ellipse cx="12" cy="12" rx="4" ry="10" transform="rotate(150 12 12)"/>
+              <circle cx="12" cy="12" r="1.8" fill="currentColor"/>
+            </svg>
+            <span class="stack-name">React.js</span>
+            <span class="stack-manifest">package.json</span>
+          </div>
+
+          <div class="stack-node" data-cat="frontend">
+            <svg class="tech-icon tech-next" viewBox="0 0 24 24" width="18" height="18" fill="currentColor">
+              <path d="M12 2a10 10 0 1 0 10 10A10 10 0 0 0 12 2zm3.8 14.8-5.3-7v6.6H9V7.6h1.7l5.3 7V7.6h1.5v9.2z"/>
+            </svg>
+            <span class="stack-name">Next.js</span>
+            <span class="stack-manifest">next.config.js</span>
+          </div>
+
+          <div class="stack-node" data-cat="frontend">
+            <svg class="tech-icon tech-angular" viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="1.8">
+              <path d="M12 2.5 3.5 5.5l1.3 11L12 21.5l7.2-5 1.3-11L12 2.5z"/>
+              <path d="M12 6.5 8.5 15h2l.7-1.8h3.6l.7 1.8h2L12 6.5zm-1.2 5.2 1.2-3 1.2 3h-2.4z" fill="currentColor" stroke="none"/>
+            </svg>
+            <span class="stack-name">Angular 17+</span>
+            <span class="stack-manifest">package.json</span>
+          </div>
+
+          <div class="stack-node" data-cat="frontend">
+            <svg class="tech-icon tech-vite" viewBox="0 0 24 24" width="18" height="18" fill="currentColor">
+              <path d="m12.3 22-8.8-15h4.2l4.6 8.5 4.6-8.5h4.2L12.3 22zm1.2-18-6.5 10.5h4.5l-1.5 5 6-9.5h-4.5l2-6z"/>
+            </svg>
+            <span class="stack-name">Vite</span>
+            <span class="stack-manifest">package.json</span>
+          </div>
+
+          <div class="stack-node" data-cat="frontend">
+            <svg class="tech-icon tech-svelte" viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M17.5 7a4.5 4.5 0 0 0-7.8-3.1L6.5 7.5a4.5 4.5 0 0 0 6.3 6.4l3.2-3.6a1.5 1.5 0 0 1 2.1 2.1l-3.2 3.6a4.5 4.5 0 0 1-6.3-6.4l3.2-3.6"/>
+            </svg>
+            <span class="stack-name">SvelteKit</span>
+            <span class="stack-manifest">package.json</span>
+          </div>
+
+          <div class="stack-node" data-cat="frontend">
+            <svg class="tech-icon tech-vue" viewBox="0 0 24 24" width="18" height="18" fill="currentColor">
+              <path d="M2 3.5h4.5L12 13 17.5 3.5H22L12 21 2 3.5zm4.8 0h3.8L12 6.5 13.4 3.5h3.8L12 12.5 6.8 3.5z"/>
+            </svg>
+            <span class="stack-name">Vue / Nuxt</span>
+            <span class="stack-manifest">package.json</span>
+          </div>
+          
+          <!-- Central Command Node: CREO CORE ENGINE -->
+          <div class="stack-node active-hub" data-cat="all">
+            <div class="creo-hub-badge">
+              <svg class="hub-c-icon" viewBox="0 0 160 150" width="28" height="26">
+                <defs>
+                  <linearGradient id="hubCGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+                    <stop offset="0%" stop-color="#ffffff"/>
+                    <stop offset="30%" stop-color="#ddd6fe"/>
+                    <stop offset="70%" stop-color="#a78bfa"/>
+                    <stop offset="100%" stop-color="#7c3aed"/>
+                  </linearGradient>
+                  <linearGradient id="hubCExtrude" x1="0%" y1="0%" x2="100%" y2="100%">
+                    <stop offset="0%" stop-color="#6d28d9"/>
+                    <stop offset="100%" stop-color="#2e1065"/>
+                  </linearGradient>
+                </defs>
+                <g transform="translate(38, 8) skewX(-13.5)">
+                  <polygon points="106,0 117,9 117,37 106,28" fill="url(#hubCExtrude)"/>
+                  <polygon points="34,28 106,28 117,37 45,37" fill="url(#hubCExtrude)"/>
+                  <polygon points="32,28 44,37 44,107 32,98" fill="url(#hubCExtrude)"/>
+                  <polygon points="32,98 44,107 117,107 106,98" fill="url(#hubCExtrude)"/>
+                  <polygon points="106,98 117,107 117,135 106,126" fill="url(#hubCExtrude)"/>
+                  <polygon points="0,126 12,135 117,135 106,126" fill="url(#hubCExtrude)"/>
+                  <path d="M0,0 L106,0 L106,28 L32,28 L32,98 L106,98 L106,126 L0,126 Z" fill="url(#hubCGrad)"/>
+                </g>
+              </svg>
+              <div class="hub-info">
+                <div class="hub-title-row">
+                  <strong>CREO CORE ENGINE</strong>
+                  <span class="hub-status-pill"><span class="tiny-dot green pulse-anim"></span> wt.exe active</span>
+                </div>
+                <span class="hub-tagline">Universal Workspace Orchestration · 40+ Toolchains</span>
+              </div>
+            </div>
+          </div>
+          
+          <!-- 2. Backend & Microservices -->
+          <div class="stack-node" data-cat="backend">
+            <svg class="tech-icon tech-go" viewBox="0 0 24 24" width="18" height="18" fill="currentColor">
+              <path d="M1.8 11.2c.4-3.8 3.5-6.7 7.4-6.7 4.2 0 7.6 3.4 7.6 7.6 0 4.1-3.3 7.5-7.4 7.6-2.5 0-4.8-1.2-6.2-3.1l2.4-1.6c.9 1.3 2.3 2.1 3.8 2.1 2.6 0 4.7-2.1 4.7-4.7s-2.1-4.7-4.7-4.7c-2.4 0-4.3 1.7-4.6 4h3.6v2.6H1.8v-3.1zm15.7 3.3h4.7v2.6h-4.7v-2.6zm0-5.8h4.7v2.6h-4.7V8.7z"/>
+            </svg>
+            <span class="stack-name">Go (Golang)</span>
+            <span class="stack-manifest">go.mod</span>
+          </div>
+
+          <div class="stack-node" data-cat="backend">
+            <svg class="tech-icon tech-spring" viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M12 2C6.5 2 2 6.5 2 12c0 4.2 2.6 7.8 6.4 9.2l1.6-3.8c-2.3-.9-3.9-3.1-3.9-5.6 0-3.4 2.7-6.1 6.1-6.1 2.3 0 4.4 1.3 5.4 3.3l3.8-1.6C19.8 4.6 16.2 2 12 2z"/>
+              <path d="M12 8c2.2 0 4 1.8 4 4 0 1.5-.8 2.8-2 3.5l1.6 3.7c2.6-1.5 4.4-4.2 4.4-7.4 0-4.7-3.8-8.5-8.5-8.5"/>
+            </svg>
+            <span class="stack-name">Spring Boot</span>
+            <span class="stack-manifest">pom.xml</span>
+          </div>
+
+          <div class="stack-node" data-cat="backend">
+            <svg class="tech-icon tech-python" viewBox="0 0 24 24" width="18" height="18" fill="currentColor">
+              <path d="M11.9 2c-3.1 0-5 1.4-5 3.3V7h5.1v.8H4.6C2.6 7.8 1 9.4 1 11.4c0 2 1.6 3.4 3.6 3.4h1.5v-2.1c0-2.2 1.8-4 4.1-4h5V7c0-2.8-2.6-5-6.3-5zm-2.2 2.2c.6 0 1.1.5 1.1 1.1s-.5 1.1-1.1 1.1-1.1-.5-1.1-1.1.5-1.1 1.1-1.1zM12.1 22c3.1 0 5-1.4 5-3.3V17H12v-.8h7.4c2 0 3.6-1.6 3.6-3.6 0-2-1.6-3.4-3.6-3.4h-1.5v2.1c0 2.2-1.8 4-4.1 4H8.8V17c0 2.8 2.6 5 6.3 5zm2.2-2.2c-.6 0-1.1-.5-1.1-1.1s.5-1.1 1.1-1.1 1.1.5 1.1 1.1-.5 1.1-1.1 1.1z"/>
+            </svg>
+            <span class="stack-name">FastAPI / Python</span>
+            <span class="stack-manifest">pyproject.toml</span>
+          </div>
+
+          <div class="stack-node" data-cat="backend">
+            <svg class="tech-icon tech-node" viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+              <polygon points="12 2 21 7.2 21 17.6 12 22.8 3 17.6 3 7.2 12 2"/>
+              <line x1="12" y1="2" x2="12" y2="12.5"/>
+              <polyline points="21 7.2 12 12.5 3 7.2"/>
+            </svg>
+            <span class="stack-name">Node / Express</span>
+            <span class="stack-manifest">package.json</span>
+          </div>
+
+          <div class="stack-node" data-cat="backend">
+            <svg class="tech-icon tech-nest" viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M12 2 3 7v6c0 5.5 3.8 10.7 9 12 5.2-1.3 9-6.5 9-12V7l-9-5z"/>
+              <path d="m9 12 2 2 4-4"/>
+            </svg>
+            <span class="stack-name">NestJS</span>
+            <span class="stack-manifest">package.json</span>
+          </div>
+
+          <div class="stack-node" data-cat="backend">
+            <svg class="tech-icon tech-rust" viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+              <circle cx="12" cy="12" r="3"/>
+              <path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"/>
+            </svg>
+            <span class="stack-name">Rust Cargo</span>
+            <span class="stack-manifest">Cargo.toml</span>
+          </div>
+          
+          <!-- 3. Databases & Ops -->
+          <div class="stack-node" data-cat="data">
+            <svg class="tech-icon tech-docker" viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M4 14h16a3 3 0 0 1-3 3H7a3 3 0 0 1-3-3z"/>
+              <rect x="6" y="10" width="3" height="3"/>
+              <rect x="10" y="10" width="3" height="3"/>
+              <rect x="14" y="10" width="3" height="3"/>
+              <rect x="10" y="6" width="3" height="3"/>
+              <path d="M20 14c.5-1.5 2-2 2-2s-.5 2.5-1.5 3"/>
+            </svg>
+            <span class="stack-name">Docker Compose</span>
+            <span class="stack-manifest">docker-compose.yml</span>
+          </div>
+
+          <div class="stack-node" data-cat="data">
+            <svg class="tech-icon tech-postgres" viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="1.8">
+              <ellipse cx="12" cy="6" rx="8" ry="3"/>
+              <path d="M4 6v6c0 1.66 3.58 3 8 3s8-1.34 8-3V6"/>
+              <path d="M4 12v6c0 1.66 3.58 3 8 3s8-1.34 8-3v-6"/>
+            </svg>
+            <span class="stack-name">PostgreSQL</span>
+            <span class="stack-manifest">:5432</span>
+          </div>
+
+          <div class="stack-node" data-cat="data">
+            <svg class="tech-icon tech-mysql" viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+              <ellipse cx="12" cy="7" rx="7" ry="3"/>
+              <path d="M5 7v10c0 1.66 3.13 3 7 3s7-1.34 7-3V7"/>
+              <path d="M5 12c0 1.66 3.13 3 7 3s7-1.34 7-3"/>
+            </svg>
+            <span class="stack-name">MySQL</span>
+            <span class="stack-manifest">:3306</span>
+          </div>
+
+          <div class="stack-node" data-cat="data">
+            <svg class="tech-icon tech-redis" viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+              <polygon points="12 2 20 6.5 12 11 4 6.5 12 2"/>
+              <polyline points="20 12.5 12 17 4 12.5"/>
+              <polyline points="20 17.5 12 22 4 17.5"/>
+            </svg>
+            <span class="stack-name">Redis</span>
+            <span class="stack-manifest">:6379</span>
+          </div>
+
+          <div class="stack-node" data-cat="data">
+            <svg class="tech-icon tech-mongo" viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M12 2C8 7 6 11 6 15c0 3.3 2.7 6 6 6s6-2.7 6-6c0-4-2-8-6-13z"/>
+              <line x1="12" y1="2" x2="12" y2="21"/>
+            </svg>
+            <span class="stack-name">MongoDB</span>
+            <span class="stack-manifest">:27017</span>
+          </div>
+        </div>
+
+      </div>
+    </section>
+
+    <!-- ====================================================================
+         SECTION 08: INSTALLATION — One-Command Setup
+         ==================================================================== -->
+    <section class="cta-section scroll-section" id="install">
+      <div class="container">
+        <div class="cta-box anim-reveal">
+          <div class="hero-badge badge-center">
+            <span class="badge-dot green pulse-anim"></span>
+            <span class="badge-text">v0.4.0 Ready for Production</span>
+          </div>
+          
+          <h2 class="cta-title">Ready to eliminate terminal fatigue?</h2>
+          <p class="cta-subtitle">
+            Install Creo in seconds. 100% open source under the MIT License. Zero telemetry, zero accounts, zero configuration fatigue.
+          </p>
+
+          <!-- Distribution Command Box -->
+          <div class="distro-card">
+            <div class="distro-tabs">
+              <button class="distro-btn active" data-dist="scoop">Windows (Scoop)</button>
+              <button class="distro-btn" data-dist="go">Go Install</button>
+              <button class="distro-btn" data-dist="source">Build from Source</button>
+            </div>
+            
+            <div class="distro-code-wrapper">
+              <span class="distro-prompt">$</span>
+              <code id="distroCommand">scoop bucket add creo https://github.com/tanmayythakare/scoop-creo && scoop install creo</code>
+              <button class="distro-copy-btn" id="distroCopyBtn" title="Copy to clipboard">
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                  <rect x="9" y="9" width="13" height="13" rx="2" ry="2"></rect>
+                  <path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"></path>
+                </svg>
+                <span>Copy</span>
+              </button>
+            </div>
+          </div>
+
+          <div class="cta-links">
+            <a href="https://github.com/tanmayythakare/creo/releases" target="_blank" rel="noopener noreferrer" class="link-item">
+              <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path><polyline points="7 10 12 15 17 10"></polyline><line x1="12" y1="15" x2="12" y2="3"></line></svg>
+              GitHub Releases (v0.4.0)
+            </a>
+            <a href="https://github.com/tanmayythakare/creo" target="_blank" rel="noopener noreferrer" class="link-item">
+              <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"></circle><line x1="12" y1="16" x2="12" y2="12"></line><line x1="12" y1="8" x2="12.01" y2="8"></line></svg>
+              Documentation & Manual
+            </a>
+            <a href="https://github.com/tanmayythakare/creo/issues" target="_blank" rel="noopener noreferrer" class="link-item">
+              <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"></circle><line x1="15" y1="9" x2="9" y2="15"></line><line x1="9" y1="9" x2="15" y2="15"></line></svg>
+              Report an Issue
+            </a>
+          </div>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <!-- ====================================================================
+  <!-- Modern Minimalist Footer -->
+  <footer class="footer">
+    <div class="container footer-layout">
+      <div class="footer-brand">
+        <span class="f-logo">creo</span>
+        <span class="f-desc">Single-command developer workspace orchestrator in Go.</span>
+      </div>
+      <div class="footer-meta">
+        <span>Designed & Engineered by <strong>Tanmay Thakare</strong></span>
+        <span>•</span>
+        <a href="https://github.com/tanmayythakare/creo/blob/main/LICENSE" target="_blank" rel="noopener noreferrer">MIT License</a>
+        <span>•</span>
+        <span class="f-sub">Windows Terminal wt.exe Protocol</span>
+      </div>
+    </div>
+  </footer>
+
+  <!-- Command Palette Modal (Ctrl+K) -->
+  <div class="palette-backdrop hidden" id="paletteBackdrop" role="dialog" aria-modal="true" aria-label="Command Palette">
+    <div class="palette-modal">
+      <div class="palette-search-bar">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <circle cx="11" cy="11" r="8"></circle>
+          <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
+        </svg>
+        <input type="text" id="paletteInput" placeholder="Search commands, docs, or navigate..." autocomplete="off">
+        <kbd class="palette-esc">Esc</kbd>
+      </div>
+      <div class="palette-results" id="paletteResults">
+        <!-- Rendered by JS -->
+      </div>
+      <div class="palette-footer">
+        <span><kbd>↑</kbd> <kbd>↓</kbd> to navigate</span>
+        <span><kbd>↵</kbd> to select</span>
+        <span><kbd>Esc</kbd> to close</span>
+      </div>
+    </div>
+  </div>
+
+  <!-- Floating Quick-Action Cyber Dock -->
+  <aside class="floating-quick-dock" id="floatingQuickDock" aria-label="Quick Actions Dock">
+    <button class="dock-btn" id="dockLaunchBtn" title="Launch 3D Workspace (creo up)">
+      <span class="dock-pulse"></span>
+      <svg width="12" height="12" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
+        <polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"></polygon>
+      </svg>
+      <span>Launch creo up</span>
+    </button>
+    <button class="dock-btn dock-btn-icon" id="dockTopBtn" title="Scroll back to top" aria-label="Scroll back to top">
+      <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="18 15 12 9 6 15"></polyline></svg>
+    </button>
+  </aside>
+
+  <!-- Floating Toast Notification -->
+  <div class="toast" id="toastNotice" role="status" aria-live="polite">
+    <span class="toast-check">✔</span>
+    <span class="toast-text">Command copied to clipboard</span>
+  </div>
+
+  <!-- Robust Application & Cyberspace Scripts (Zero CORS blocking on file:/// and http://) -->
+  <script src="lib/lenis.min.js"></script>
+  <script src="./orbital-engine.js"></script>
+  <script type="module" src="./dithered-object.js"></script>
+  <script src="app.js"></script>
+</body>
+</html>

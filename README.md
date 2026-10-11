@@ -11,12 +11,16 @@
   <a href="https://github.com/darkroomengineering/lenis"><img src="https://img.shields.io/badge/Lenis-Inertial%20Scroll-black?style=flat-square" alt="Lenis Scroll"></a>
   <a href="https://developer.mozilla.org/en-US/docs/Web/API/Web_Audio_API"><img src="https://img.shields.io/badge/Web%20Audio-Procedural%20FX-informational?style=flat-square" alt="Web Audio API"></a>
   <a href="LICENSE"><img src="https://img.shields.io/badge/License-MIT-yellow?style=flat-square" alt="MIT License"></a>
-  <a href="#quickstart"><img src="https://img.shields.io/badge/Deployment-Local-informational?style=flat-square" alt="Local Deployment"></a>
+  <a href="https://creo.tanmayythakare.online"><img src="https://img.shields.io/badge/Live%20Demo-Available-8b5cf6?style=flat-square" alt="Live Demo"></a>
 </p>
 
 <p align="center">
   Cybernetic microservice orchestration matrix, extruded Three.js halftone post-processing, and interactive terminal simulator.<br>
   Zero external runtime dependencies · 60/120fps GPU-accelerated rendering · Procedural Web Audio API soundscape.
+</p>
+
+<p align="center">
+  <strong>Live Production Showcase:</strong> <a href="https://creo.tanmayythakare.online"><strong>https://creo.tanmayythakare.online</strong></a>
 </p>
 
 <p align="center">
